@@ -1,8 +1,10 @@
 'use strict';
 
+import AWS from 'aws-sdk';
 import BaseAdapter from 'ghost-storage-base';
 import { promises as fs } from 'fs';
 
+const s3 = new AWS.S3();
 const stripLeadingSlash = s => s.indexOf('/') === 0 ? s.substring(1) : s;
 
 class Store extends BaseAdapter {
