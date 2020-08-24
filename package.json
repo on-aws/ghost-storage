@@ -1,0 +1,22 @@
+{
+  "name": "on-aws-ghost-storage",
+  "version": "0.0.1",
+  "description": "Store content from Ghost in AWS S3. Serve by CloudFront",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/on-aws/ghost-storage"
+  },
+  "keywords": [
+    "ghost",
+    "storage",
+    "aws",
+    "s3",
+    "cloudfront"
+  ],
+  "author": "Konstantin Vlasenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/on-aws/ghost-storage/issues"
+  }
+}

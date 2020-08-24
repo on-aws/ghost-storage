@@ -1,13 +1,13 @@
 'use strict';
 
-import AWS from 'aws-sdk';
-import BaseAdapter from 'ghost-storage-base';
-import { promises as fs } from 'fs';
+const AWS = require('aws-sdk');
+const StorageBase = require('ghost-storage-base');
+const fs = require('fs').promises;
 
 const s3 = new AWS.S3();
 const stripLeadingSlash = s => s.indexOf('/') === 0 ? s.substring(1) : s;
 
-class Store extends BaseAdapter {
+class OnAWSFileStore extends StorageBase {
   constructor(config = {}) {
     super(config);
 
@@ -15,19 +15,17 @@ class Store extends BaseAdapter {
       bucketName,
       keyPrefix,
       distributionDomainName
-    } = config
+    } = config;
   }
 
-  async exists(fileName, targetDir) {
+  exists(fileName, targetDir) {
     const directory = targetDir || this.getTargetDir(this.keyPrefix);
 
     return new Promise((resolve) => {
-      await s3.headObject({
+      s3.headObject({
         Bucket: this.bucketName,
         Key: stripLeadingSlash(join(directory, fileName))
-      }).promise()
-      .then(() => resolve(true))
-      .catch(() => resolve(false))
+      }, (err) => err ? resolve(false) : resolve(true));
     });
   }
 
@@ -39,13 +37,11 @@ class Store extends BaseAdapter {
         this.getUniqueFileName(image, directory),
         fs.readFile(image.path)
       ]).then(([ fileName, file ]) => {
-        await s3.putObject({
+        s3.putObject({
           Body: file,
           Bucket: this.bucketName,
           Key: stripLeadingSlash(fileName)
-        }).promise()
-        .catch(err => reject(err));
-        resolve(`${this.distributionDomainName}/${fileName}`);
+        }, (err) => err ? reject(err) : resolve(`${this.distributionDomainName}/${fileName}`));
       })
       .catch(err => reject(err));
     });
@@ -62,12 +58,10 @@ class Store extends BaseAdapter {
     const directory = targetDir || this.getTargetDir(this.keyPrefix);
 
     return new Promise((resolve) => {
-      await s3.deleteObject({
+      s3.deleteObject({
         Bucket: this.bucketName,
         Key: stripLeadingSlash(join(directory, fileName))
-      }).promise()
-      .then(() => resolve(true))
-      .catch(() => resolve(false))
+      }, (err) => err ? resolve(false) : resolve(true));
     });
   }
 
@@ -76,4 +70,4 @@ class Store extends BaseAdapter {
   }
 }
 
-export default Store;
+module.exports = OnAWSFileStore;
