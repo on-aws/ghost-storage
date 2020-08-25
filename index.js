@@ -7,7 +7,7 @@ const fs = require('fs').promises;
 const s3 = new AWS.S3();
 const stripLeadingSlash = s => s.indexOf('/') === 0 ? s.substring(1) : s;
 
-class OnAWSFileStore extends StorageBase {
+class Store extends StorageBase {
   constructor(config = {}) {
     super(config);
 
@@ -65,9 +65,12 @@ class OnAWSFileStore extends StorageBase {
     });
   }
 
-  read() {
-    return Promise.reject('Not implemented');
+  read(options) {
+    // NOTE: Implemented to address https://github.com/ifvictr/ghost-storage-github/issues/22
+    return new Promise((resolve, reject) => {
+      reject({options});
+    })
   }
 }
 
-module.exports = OnAWSFileStore;
+module.exports = Store;
