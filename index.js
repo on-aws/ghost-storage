@@ -3,6 +3,7 @@
 const AWS = require('aws-sdk');
 const StorageBase = require('ghost-storage-base');
 const fs = require('fs').promises;
+const path = require('path');
 
 const s3 = new AWS.S3();
 const stripLeadingSlash = s => s.indexOf('/') === 0 ? s.substring(1) : s;
@@ -24,7 +25,7 @@ class Store extends StorageBase {
     return new Promise((resolve) => {
       s3.headObject({
         Bucket: this.bucketName,
-        Key: stripLeadingSlash(join(directory, fileName))
+        Key: stripLeadingSlash(path.join(directory, fileName))
       }, (err) => err ? resolve(false) : resolve(true));
     });
   }

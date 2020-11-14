@@ -18,5 +18,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/on-aws/ghost-storage/issues"
+  },
+  "dependencies": {
+    "aws-sdk": "2.x",
+    "ghost-storage-base": "^0.0.5"
   }
 }
