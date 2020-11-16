@@ -8,30 +8,27 @@ const path = require('path');
 const s3 = new AWS.S3();
 const stripLeadingSlash = s => s.indexOf('/') === 0 ? s.substring(1) : s;
 
+var options = {};
+
 class Store extends StorageBase {
   constructor(config = {}) {
-    super(config);
-
-    const {
-      bucketName,
-      keyPrefix,
-      distributionDomainName
-    } = config;
+    super();
+    options = config;
   }
 
   exists(fileName, targetDir) {
-    const directory = targetDir || this.getTargetDir(this.keyPrefix);
+    const directory = targetDir || this.getTargetDir(options.keyPrefix);
 
     return new Promise((resolve) => {
       s3.headObject({
-        Bucket: this.bucketName,
+        Bucket: options.bucketName,
         Key: stripLeadingSlash(path.join(directory, fileName))
       }, (err) => err ? resolve(false) : resolve(true));
     });
   }
 
   save(image, targetDir) {
-    const directory = targetDir || this.getTargetDir(this.keyPrefix);
+    const directory = targetDir || this.getTargetDir(options.keyPrefix);
 
     return new Promise((resolve, reject) => {
       Promise.all([
@@ -40,9 +37,9 @@ class Store extends StorageBase {
       ]).then(([ fileName, file ]) => {
         s3.putObject({
           Body: file,
-          Bucket: this.bucketName,
+          Bucket: options.bucketName,
           Key: stripLeadingSlash(fileName)
-        }, (err) => err ? reject(err) : resolve(`${this.distributionDomainName}/${fileName}`));
+        }, (err) => err ? reject(err) : resolve(`${options.distributionDomainName}/${fileName.slice(options.keyPrefix.length + 1)}`));
       })
       .catch(err => reject(err));
     });
@@ -56,11 +53,11 @@ class Store extends StorageBase {
   }
 
   delete() {
-    const directory = targetDir || this.getTargetDir(this.keyPrefix);
+    const directory = targetDir || this.getTargetDir(options.keyPrefix);
 
     return new Promise((resolve) => {
       s3.deleteObject({
-        Bucket: this.bucketName,
+        Bucket: options.bucketName,
         Key: stripLeadingSlash(join(directory, fileName))
       }, (err) => err ? resolve(false) : resolve(true));
     });

@@ -1,6 +1,6 @@
 {
   "name": "on-aws-ghost-storage",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Store content from Ghost in AWS S3. Serve by CloudFront",
   "main": "index.js",
   "repository": {
